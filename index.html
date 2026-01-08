@@ -55,16 +55,17 @@ html, body {
 
 .weekly-row button {
   border: none;
-  background: #D8CFC4;
-  color: #2F2C28;
+  background: #E6DED5;
+  color: #4A463F;
   padding: 4px 10px;
   border-radius: 999px;
   font-size: 11px;
   cursor: pointer;
+  font-weight: 500;
 }
 
 .weekly-row button:hover {
-  background: #e6dfd7;
+  background: #DED5CB;
 }
 
 .card {
@@ -276,8 +277,8 @@ function removeItem(type, index) {
   render();
 }
 
+/* ✅ FIXED RESET (Notion-safe) */
 function resetWeek() {
-  if (!confirm("Reset everything for a new week?")) return;
   data.eatFirst = [];
   data.eatLater = [];
   data.prep = [];
