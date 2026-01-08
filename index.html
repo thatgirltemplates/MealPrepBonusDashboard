@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meal Prep Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Cormorant+Garamond:wght@400&display=swap" rel="stylesheet">
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  font-family: Inter, sans-serif;
+}
+
+.wrapper {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 14px;
+  transform: scale(0.96);
+  transform-origin: top center;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.header h1 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 26px;
+  font-weight: 400;
+  margin: 4px 0;
+  color: #4a463f;
+}
+
+.header p {
+  font-size: 11px;
+  opacity: 0.65;
+}
+
+.card {
+  background: linear-gradient(135deg, #ffffff 0%, #f3efe9 100%);
+  border-radius: 18px;
+  padding: 14px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  margin-bottom: 12px;
+}
+
+/* STATS */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: -0.5px;
+  color: #4a463f;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.stat-label {
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+.section-title {
+  font-size: 11px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  color: #6b645b;
+}
+
+.list {
+  max-height: 130px;
+  overflow-y: auto;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255,255,255,0.85);
+  border-radius: 10px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.item button {
+  background: none;
+  border: none;
+  font-size: 14px;
+  opacity: 0.4;
+  cursor: pointer;
+}
+
+.item button:hover {
+  opacity: 0.9;
+}
+
+.add-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.add-row input {
+  flex: 1;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,0.12);
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.add-row button {
+  border-radius: 999px;
+  border: none;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  background: #e8e2da;
+  color: #4a463f;
+}
+
+/* SOFT DIVIDER */
+.soft-divider {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(0,0,0,0.08),
+    transparent
+  );
+  margin: 10px 0;
+}
+</style>
+</head>
+
+<body>
+<div class="wrapper">
+
+<div class="header">
+  <h1>Meal Prep Dashboard</h1>
+  <p>Decide what to eat without overthinking</p>
+</div>
+
+<div class="card stats">
+  <div>
+    <div class="stat-number" id="prepCount">0</div>
+    <div class="stat-label">Prep 👩‍🍳</div>
+  </div>
+  <div>
+    <div class="stat-number" id="eatFirstCount">0</div>
+    <div class="stat-label">Eat first 🍽</div>
+  </div>
+  <div>
+    <div class="stat-number" id="eatLaterCount">0</div>
+    <div class="stat-label">Eat later ❄</div>
+  </div>
+</div>
+
+<div class="card" style="text-align:center; padding:12px;">
+  <div style="font-size:12px; color:#6b645b; opacity:0.85;">
+    ✨ Today’s focus: eat what’s already ready
+  </div>
+</div>
+
+<div class="soft-divider"></div>
+
+<div class="card">
+  <div class="section-title">🍽 Eat First</div>
+  <div class="list" id="eatFirst"></div>
+  <div class="add-row">
+    <input id="eatFirstInput" placeholder="Add leftover or older meal">
+    <button onclick="addItem('eatFirst')">Add</button>
+  </div>
+</div>
+
+<div class="soft-divider"></div>
+
+<div class="card">
+  <div class="section-title">❄ Eat Later</div>
+  <div class="list" id="eatLater"></div>
+  <div class="add-row">
+    <input id="eatLaterInput" placeholder="Add fresh prep or freezer meal">
+    <button onclick="addItem('eatLater')">Add</button>
+  </div>
+</div>
+
+<div class="soft-divider"></div>
+
+<div class="card">
+  <div class="section-title">👩‍🍳 Prep Tasks</div>
+  <div class="list" id="prep"></div>
+  <div class="add-row">
+    <input id="prepInput" placeholder="Add prep task">
+    <button onclick="addItem('prep')">Add</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+const data = { eatFirst: [], eatLater: [], prep: [] };
+
+function render() {
+  ["eatFirst","eatLater","prep"].forEach(type => {
+    const list = document.getElementById(type);
+    list.innerHTML = "";
+    data[type].forEach((text,i) => {
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `<span>${text}</span><button onclick="removeItem('${type}',${i})">×</button>`;
+      list.appendChild(div);
+    });
+  });
+
+  prepCount.textContent = data.prep.length;
+  eatFirstCount.textContent = data.eatFirst.length;
+  eatLaterCount.textContent = data.eatLater.length;
+}
+
+function addItem(type) {
+  const input = document.getElementById(type + "Input");
+  const value = input.value.trim();
+  if (!value) return;
+  data[type].push(value);
+  input.value = "";
+  render();
+}
+
+function removeItem(type, index) {
+  data[type].splice(index, 1);
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
