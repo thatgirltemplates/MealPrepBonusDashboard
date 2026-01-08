@@ -244,7 +244,28 @@ html, body {
 </div>
 
 <script>
-const data = { eatFirst: [], eatLater: [], prep: [] };
+const STORAGE_KEY = "meal_prep_dashboard_v1";
+
+let data = {
+  eatFirst: [],
+  eatLater: [],
+  prep: []
+};
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function loadData() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try {
+      data = JSON.parse(saved);
+    } catch {
+      data = { eatFirst: [], eatLater: [], prep: [] };
+    }
+  }
+}
 
 function render() {
   ["eatFirst","eatLater","prep"].forEach(type => {
@@ -269,22 +290,24 @@ function addItem(type) {
   if (!value) return;
   data[type].push(value);
   input.value = "";
+  saveData();
   render();
 }
 
 function removeItem(type, index) {
   data[type].splice(index, 1);
+  saveData();
   render();
 }
 
-/* ✅ FIXED RESET (Notion-safe) */
 function resetWeek() {
-  data.eatFirst = [];
-  data.eatLater = [];
-  data.prep = [];
+  data = { eatFirst: [], eatLater: [], prep: [] };
+  localStorage.removeItem(STORAGE_KEY);
   render();
 }
 
+/* INIT */
+loadData();
 render();
 </script>
 </body>
